@@ -1,0 +1,18 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">SQL Azure Sizing Estimator</h1>
+    <p>Need help figuring out which Azure SQL Database to use based on your current usage? This website is built to help you do just that!</p>
+    <p>Currently we only support Managed Instances, but more are coming in the future, the different options are available below:</p>
+    <div class="card">
+        <div class="card-body">
+            <nav class="nav nav-pills nav-justified">
+                <a class="nav-item nav-link text-dark" asp-area="" asp-page="/ManagedInstance">Managed Instance</a>
+            </nav>
+        </div>
+    </div>
+</div>

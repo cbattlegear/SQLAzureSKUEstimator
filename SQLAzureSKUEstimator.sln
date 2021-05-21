@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SQLAzureSKUEstimator", "SQLAzureSKUEstimator\SQLAzureSKUEstimator.csproj", "{168EDECF-7B0D-41BF-9C12-A64EB6B8FC36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessAndRecommendProcMon", "ProcessAndRecommendProcMon\ProcessAndRecommendProcMon.csproj", "{B514F12D-6291-416B-AE98-CF4EA8A33D68}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{168EDECF-7B0D-41BF-9C12-A64EB6B8FC36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{168EDECF-7B0D-41BF-9C12-A64EB6B8FC36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{168EDECF-7B0D-41BF-9C12-A64EB6B8FC36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{168EDECF-7B0D-41BF-9C12-A64EB6B8FC36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B514F12D-6291-416B-AE98-CF4EA8A33D68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B514F12D-6291-416B-AE98-CF4EA8A33D68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B514F12D-6291-416B-AE98-CF4EA8A33D68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B514F12D-6291-416B-AE98-CF4EA8A33D68}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {759C3F04-2F48-48DF-854B-FB31C691E8E4}
+	EndGlobalSection
+EndGlobal

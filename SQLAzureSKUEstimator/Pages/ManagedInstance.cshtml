@@ -1,0 +1,296 @@
+﻿@page
+@model SQLAzureSKUEstimator.Pages.ManagedInstanceModel
+@{
+    ViewData["Title"] = "Managed Instance Sizing";
+}
+
+<div class="row">
+    <div class="col-sm">
+        <h2>Step 1: Gather the Data</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm">
+        <p><a href="/GatherSQLCountersForManagedInstance.zip">Download the compressed PowerShell script to gather the counters</a></p>
+        <p>Extract the script and then Run as Administrator with the command:</p>
+        <p><code>.\GatherSQLCountersForManagedInstance.ps1 -Runtime 86400</code></p>
+        <p>The Runtime is the number of seconds the collection will run, please have it be at least 2 hours.</p>
+        <p>Once the collection has finished, upload the file in Step 2 below!</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm">
+        <h2>Step 2: Process the Data</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm">
+        <p>Upload your data so that we can process it.</p>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-check">
+                <input aria-describedby="ssdHelp" class="form-check-input" asp-for="SSD" />
+                <label class="form-check-label" asp-for="SSD">SSD</label>
+                <small id="ssdHelp" class="form-text text-muted">Select this if your on prem SQL Server is backed by SSDs or your Azure VM is backed by Ultradisks.</small>
+            </div>
+            <div class="form-group">
+                <label asp-for="Region">Region</label>
+                <select id="regionHelp" class="form-control" asp-for="Region" asp-items="Model.Regions"></select>
+                <small id="regionHelp" class="form-text text-muted">Select the Azure Region you plan to deploy to for accurate pricing information.</small>
+            </div>
+            <div class="form-group">
+                <input class="form-control-file" type="file" asp-for="Upload" />
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@if (!(Model.bf == null))
+{
+    <div class="row">
+        <div class="col-sm">
+            <h2>Step 3: Interpret the Data</h2>
+        </div>
+    </div>
+    <div class="row">
+        @foreach (var item in Model.bf)
+        {
+            string RecommendedStyle = "";
+            @if (item.Recommended)
+            {
+                RecommendedStyle = "border-success";
+            }
+            <div class="col-sm-6">
+                <div class="card mb-3 @RecommendedStyle">
+                    <div class="card-body">
+                        <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
+                        <p class="card-text">
+                            Based on your @Html.DisplayFor(modelItem => item.StatName) usage of @Html.DisplayFor(modelItem => item.InfluencingStat)
+                            we suggest @Html.DisplayFor(modelItem => item.Name) which has a @Html.DisplayFor(modelItem => item.StatName) of @Html.DisplayFor(modelItem => item.MIStat)
+                            @if (item.Recommended)
+                            {
+                                <span>This is the recommended size based on your bottleneck caused by @Html.DisplayFor(modelItem => item.StatName).</span>
+                            }
+
+                        </p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <span class="font-weight-bold">Total Monthly Cost: </span> @string.Format("{0:C}", Math.Round(item.TotalCost, 2))<br />
+                        <span class="font-weight-light">Compute Monthly Cost: @string.Format("{0:C}", Math.Round(item.MonthlyComputeCost, 2))</span><br />
+                        <span class="font-weight-light">Storage Monthly Cost: @string.Format("{0:C}", Math.Round(item.MonthlyStorageCost, 2))</span><br />
+                        <span class="font-weight-light">Licensing Monthly Cost: @string.Format("{0:C}", Math.Round(item.MonthlyLicensingCost, 2))</span><br />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="cpuchart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="memorychart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="iopschart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="tlogchart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="connectionchart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="card-text">
+                        <canvas id="spacechart" height="200"></canvas>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            var chartData = JSON.parse('@Html.Raw(@Model.procmonchartdata)');
+
+            function cpuchart() {
+                var ctx = document.getElementById('cpuchart');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: chartData.CPUUsage,
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                type: 'timeseries',
+                            },
+                            y: {
+                                suggestedMin: 0,
+                                suggestedMax: 100
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'CPU Usage (%)'
+                            }
+                        }
+                    }
+                });
+        }
+
+        function memorychart() {
+            var ctx = document.getElementById('memorychart');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData.MemoryUsage,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Memory Assigned (GB)'
+                        }
+                    }
+                }
+            });
+        }
+
+        function iopschart() {
+            var ctx = document.getElementById('iopschart');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData.TotalIOPS,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'IO Per Second'
+                        }
+                    }
+                }
+            });
+        }
+
+        function tlogchart() {
+            var ctx = document.getElementById('tlogchart');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData.TLogBandwidth,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Transaction Log Bandwidth (MBps)'
+                        }
+                    }
+                }
+            });
+        }
+
+        function connectionchart() {
+            var ctx = document.getElementById('connectionchart');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData.RequestsAndConnections,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'User Connections and Worker Requests'
+                        }
+                    }
+                }
+            });
+        }
+
+        function spacechart() {
+            var ctx = document.getElementById('spacechart');
+            new Chart(ctx, {
+                type: 'line',
+                data: chartData.TotalSizeofDatabases,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'timeseries',
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Total Database Storage (GB)'
+                        }
+                    }
+                }
+            });
+        }
+
+        cpuchart();
+        memorychart();
+        iopschart();
+        tlogchart();
+        connectionchart();
+        spacechart();
+    </script>
+}
+
