@@ -14,22 +14,23 @@ for other Azure PaaS Database technologies.
 
 ### SQL Azure Managed Instance Mapping
 
-**\SQLServer:SQL Statistics\Batch Requests/sec**
+**\SQLServer:SQL Statistics\Batch Requests/sec**  
 Mapped to Max Workers
 
-**\SQLServer:General Statistics\User Connections** 
+
+**\SQLServer:General Statistics\User Connections**   
 Mapped to Max Logins
 
-**\SQLServer:Memory Manager\Target Server Memory (KB)** 
-**\SQLServer:Memory Manager\Total Server Memory (KB)** 
+**\SQLServer:Memory Manager\Target Server Memory (KB)**  
+**\SQLServer:Memory Manager\Total Server Memory (KB)**  
 Mapped to Assigned Memory
 
-**\Processor(*)\% Processor Time** 
+**\Processor(*)\% Processor Time**  
 Mapped to number of Cores and Cores used
 
-**\LogicalDisk(_Total)\Disk Reads/sec** 
-**\LogicalDisk(_Total)\Disk Writes/sec**
+**\LogicalDisk(_Total)\Disk Reads/sec**  
+**\LogicalDisk(_Total)\Disk Writes/sec** 
 Mapped to Total IOPS
 
-**\SQLServer:Databases(_Total)\Log Bytes Flushed/sec**
+**\SQLServer:Databases(_Total)\Log Bytes Flushed/sec**  
 Mapped to TLog Bandwidth
